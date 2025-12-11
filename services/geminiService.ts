@@ -1,6 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { LaunchSite, AnalysisResult } from "../types";
 
+const API_KEY = process.env.GEMINI_API_KEY || process.env.API_KEY;
+
 const parseAIResponse = (text: string): AnalysisResult | null => {
   try {
     // Basic cleanup if the model adds markdown code blocks despite schema
@@ -19,12 +21,12 @@ export const analyzeLaunch = async (
   targetLng?: number,
   notamText?: string
 ): Promise<AnalysisResult | null> => {
-  if (!process.env.API_KEY) {
-    console.error("API Key missing");
+  if (!API_KEY) {
+    console.error("API Key missing. Set GEMINI_API_KEY in your environment.");
     return null;
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   const prompt = `
     Analyze a rocket launch from ${site.name} (${site.country}) using a ${rocket} rocket.
@@ -95,9 +97,9 @@ export const analyzeLaunch = async (
 
 export const searchNextSpaceflightSimulated = async (query: string): Promise<any[]> => {
     // Simulating a search via Gemini since we can't scrape NextSpaceflight directly in browser
-    if (!process.env.API_KEY) return [];
-    
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (!API_KEY) return [];
+
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
     const prompt = `Generate a realistic JSON list of 3 upcoming or recent rocket launches based on the query: "${query}". 
     Focus on China (CASC) or India (ISRO) missions if unspecified.
     Include fields: mission (string), rocket (string), siteId (one of: jiuquan, xichang, taiyuan, wenchang, sdsc, terls), date (string YYYY-MM-DD).`;
